@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tutorial one: Hello World</title>
+    <script src="lib/jquery-3.2.1.js"></script>
+    <script src="lib/json2.js"></script>
+    <script src="lib/underscore.js"></script>
+    <script src="lib/backbone.js"></script>
+
+  </head>
+  <body>
+    <ul></ul>
+    <script>
+    (function($) {
+      var addItemView = Backbone.View.extend({
+        el:$('body'),
+        events: {
+          'click button#add':'addItem'
+        },
+        initialize:function(){
+          _.bindAll(this,'render','addItem');
+          this.counter = 0;
+          this.render();
+        },
+        render:function(){
+         $(this.el).append("<button id='add'>Add list item</button>")
+        },
+        addItem:function(){
+          this.counter++;
+          $(this.el).append("<li>hello"+this.counter+"</li>");
+        }
+      })
+
+      var listView = new addItemView();
+    })(jQuery);
+    </script>
+  </body>
+</html>

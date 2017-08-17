@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tutorial one: Hello World</title>
+    <script src="lib/jquery-3.2.1.js"></script>
+    <script src="lib/json2.js"></script>
+    <script src="lib/underscore.js"></script>
+    <script src="lib/backbone.js"></script>
+  </head>
+  <body>
+    <script>
+    (function($) {
+      var Item = Backbone.Model.extend({
+        defaults:{
+          'left':'hello',
+          'right':'world'
+        }
+      });
+      var Items = Backbone.Collection.extend({
+        model: Item
+      });
+
+      var ItemView = Backbone.View.extend({
+        tagName:'li',
+        initialize: function(){
+          _.bindAll(this,'render','unrender','deleteItem','swapItem');
+          this.model.bind('change',this.render);
+          this.model.bind('remove',this.unrender);
+        },
+        /* html */
+        render: function(){
+          $(this.el).html('<span class="left">'+this.model.get('left') + '</span>' + '<span class="right">'+this.model.get('right') + '</span>'+
+            '<button class="swape">swape</button><button class="delete">delete</button>');
+            return this;
+        },
+        unrender: function(){
+          $(this.el).remove();
+        },
+        /* events */
+        events: {
+          'click .swape':'swapItem',
+          'click .delete':'deleteItem'
+        },
+        deleteItem:function(){
+          this.model.destroy();
+        },
+        swapItem:function(){
+          this.model.set({
+            'left':this.model.get('right'),
+            'right':this.model.get('left')
+          })
+        }
+      });
+
+      var PageView = Backbone.View.extend({
+        el:$('body'),
+        events: {
+          'click #addBtn':'addItem'
+        },
+        initialize: function(){
+          _.bindAll(this,'render','appendItemView','addItem');
+          this.items = new Items();
+          this.items.on('add',this.appendItemView);
+          this.counter = 0;
+          this.render();
+        },
+        /* html */
+        render:function(){
+          var self = this;
+          if(this.items.models.length > 0){
+            _.each(this.items.models,function(item){
+              self.appendItemView(item);
+            })
+          }
+          $(this.el).append('<ul></ul>');
+          $(this.el).append('<button id="addBtn">add this item</button>');
+        },
+        appendItemView: function(model,model2){
+          var itemview = new ItemView({
+            model:model
+          })
+          $('ul').append(itemview.render().el);
+        },
+        /* events */
+        addItem: function(){
+          this.counter++;
+          var item = new Item();
+          item.set({
+            'right':item.get('right') + this.counter
+          })
+          this.items.add(item);
+        }
+      });
+
+      var pageview = new PageView();
+    })(jQuery);
+    </script>
+  </body>
+</html>
